@@ -1,0 +1,1103 @@
+options:
+    ServerName: &6Gun&eGens&r
+    PermissionDenied: {@ServerName} &cYou do not have permission to execute this command!
+    prefix: ;
+    staffRole: 707746440289583164
+    administratorRole: 590770053658705930
+    logChannel: 618611040581844993
+    chatChannel: 708523886764884010
+
+on first join:
+    #broadcast "&6%player%&7 has joined &7[&6##%amount of all offline players%&7]"
+    if {%player's uuid%::prestige} is 0:
+        set {%player's uuid%::prestige} to 0
+
+on join:
+    if {%player's uuid%::level} is not set:
+        set {%player's uuid%::level} to 0
+    if {%player's uuid%::xp} is not set:
+        set {%player's uuid%::xp} to 0
+        set {%player's uuid%::xpincrement} to 5
+    if {%player's uuid%::prestige} is not set:
+        set {%player's uuid%::prestige} to 0
+    if {%player's uuid%::chatcolor} is not set:
+        set {%player's uuid%::chatcolor} to "&7"
+    if {%player's uuid%.playtime.seconds} is not set:
+        set {%player's uuid%.playtime.seconds} to 0
+    if {%player's uuid%.playtime.minutes} is not set:
+        set {%player's uuid%.playtime.minutes} to 0
+    if {%player's uuid%.playtime.hours} is not set:
+        set {%player's uuid%.playtime.hours} to 0
+    if {%player's uuid%.playtime.days} is not set:
+        set {%player's uuid%.playtime.days} to 0
+    if {%player's uuid%.playtime.weeks} is not set:
+        set {%player's uuid%.playtime.weeks} to 0
+    if {%player's uuid%.playtime.months} is not set:
+        set {%player's uuid%.playtime.months} to 0
+    if {%player's uuid%.playtime.years} is not set:
+        set {%player's uuid%.playtime.years} to 0
+#
+on connect:
+    if {server::maintenancemode} is true:
+        if player has permission "gungen.maintenance.bypass":
+            send "&7%player% has bypassed the maintenance mode" to console
+        else:
+            kick the player due to "&cServer is currently in maintenance mode!%nl%We're sorry for the inconvenience"
+
+
+# Playtime System
+
+every 1 second:
+    loop all players:
+        #Add 1 Second every second
+        add 1 to {%loop-player's uuid%.playtime.seconds}
+        #If seconds variable is 60
+        if {%loop-player's uuid%.playtime.seconds} = 60:
+            #Add 1 minute every 60 seconds
+            add 1 to {%loop-player's uuid%.playtime.minutes}
+            #Reset seconds variable to 0
+            set {%loop-player's uuid%.playtime.seconds} to 0
+        #If minutes variable is 60
+        if {%loop-player's uuid%.playtime.minutes} = 60:
+            #Add 1 hour every 60 minutes
+            add 1 to {%loop-player's uuid%.playtime.hours}
+            #Reset minutes variable to 0
+            set {%loop-player's uuid%.playtime.minutes} to 0
+        #If hours variable is 24
+        if {%loop-player's uuid%.playtime.hours} = 24:
+            #Add 1 day every 24 hours
+            add 1 to {%loop-player's uuid%.playtime.days}
+            #Reset hours variable to 0
+            set {%loop-player's uuid%.playtime.hours} to 0
+        #If days variable is 7
+        if {%loop-player's uuid%.playtime.days} = 7:
+            #Add 1 week every 7 days
+            add 1 to {%loop-player's uuid%.playtime.weeks}
+            #Reset hours variable to 0
+            set {%loop-player's uuid%.playtime.days} to 0
+        #If weeks variable is 4
+        if {%loop-player's uuid%.playtime.weeks} = 4:
+            #Add 1 month every 4 weeks
+            add 1 to {%loop-player's uuid%.playtime.months}
+            #Reset weeks variable to 0
+            set {%loop-player's uuid%.playtime.weeks} to 0
+        #If months variable is 12
+        if {%loop-player's uuid%.playtime.months} = 12:
+            #Add 1 year every 12 months
+            add 1 to {%loop-player's uuid%.playtime.years}
+            #Reset months variable to 0
+            set {%loop-player's uuid%.playtime.months} to 0
+    wait 1 second
+
+command /playtime <player>:
+    trigger:
+        if arg-1 is set:
+            message "&7%arg-1%'s playtime"
+            message "&7%{%arg-1's uuid%.playtime.seconds}% Seconds"
+            message "&7%{%arg-1's uuid%.playtime.minutes}% Minutes"
+            message "&7%{%arg-1's uuid%.playtime.hours}% Hours"
+            message "&7%{%arg-1's uuid%.playtime.days}% Days"
+            message "&7%{%arg-1's uuid%.playtime.months}% Months"
+            message "&7%{%arg-1's uuid%.playtime.years}% Years"
+        else:
+            message "&7%player%'s playtime"
+            message "&7%{%player's uuid%.playtime.seconds}% Seconds"
+            message "&7%{%player's uuid%.playtime.minutes}% Minutes"
+            message "&7%{%player's uuid%.playtime.hours}% Hours"
+            message "&7%{%player's uuid%.playtime.days}% Days"
+            message "&7%{%player's uuid%.playtime.months}% Months"
+            message "&7%{%player's uuid%.playtime.years}% Years"
+
+# Discord Bot
+
+on first join:
+    send "%player% is the ##%amount of all offline players% player to join!" to {chatChannel} with "Ares"
+
+on join:
+    if player has permission "gungen.staff":
+        send "[✰] %player% has joined" to {chatChannel} with "Ares"
+    else:
+        send "%player% has joined" to {chatChannel} with "Ares"
+
+on quit:
+    if player has permission "gungen.staff":
+        send "[✰] %player% has quit" to {chatChannel} with "Ares"
+    else:
+        send "%player% has quit" to {chatChannel} with "Ares"
+
+on load:
+    set {_token} to "NzA3NzUwODEzNjE5MTkxODE4.XrNWeA.r52FFSBy558QEEDBfwQgzKyvre0"
+    login to "NzA3NzUwODEzNjE5MTkxODE4.XrNWeA.r52FFSBy558QEEDBfwQgzKyvre0" with the name "Ares"
+    wait 5 seconds
+    set {channel} to channel with id "{@logChannel}"
+    set {chatChannel} to channel with id "{@chatChannel}"
+    set {staffRole} to role with id "{@staffRole}"
+
+on chat:
+    wait 5 ticks
+    event isn't canceled
+    if player doesn't have permission "gungen.staff":
+        if message contains "discord.gg" or "invite":
+            send "***This message was flagged for advertising***%nl%**please use the following reactions to moderate this message**%nl%**:red_square: - Ban %player%**%nl%**:yellow_square: - Kick %player%**%nl%**:green_square: - Mute %player%**%nl%" to {chatChannel} with "Ares"
+            send "%uncolored player's prefix% %player%: %message%" to {chatChannel} with "Ares"
+            add reaction "green_square" to message with "Ares"
+            add reaction "yellow_square" to message with "Ares"
+            add reaction "red_square" to message with "Ares"
+    if message contains "@", "!@", "<" or ">":
+        send "Message contained a mention" to console
+    else:
+        if player has permission "gungen.staff":
+            send "[✰] %player%: %message%" to {chatChannel} with "Ares"
+        else:
+            send "%player%: %message%" to {chatChannel} with "Ares"
+
+on guild message received:
+    content of event-message doesn't start with "!"
+    id of event-channel is "{@chatChannel}"
+    set {_r::*} to roles of event-member
+    send "&3[Discord] &7[%{_r::1} ? """"%&7] %event-member%&8: &f%event-message%" to all players
+
+discord command plist:
+    prefixes: {@prefix}
+    executable in: guild
+    bots: Ares
+    trigger:
+        if size of all players is greater than 0:
+            send "Players:%nl%```%all players%```%nl%`%amount of online players%/%max player count%`" to event-channel with "Ares"
+        else if size of all players is 0:
+            send "Players:%nl%```No Players Online```%nl%`%amount of online players%/%max player count%`" to event-channel with "Ares"
+
+discord command kick <player> <text>:
+    prefixes: {@prefix}
+    executable in: guild
+    bots: Ares
+    trigger:
+        if event-user has {staffRole}:
+            if arg 2 is not set:
+                create embed:
+                    set author info of the embed to "Punishments"
+                    set the title of embed to title with text "A Reason is required to kick!"
+                    set color of the embed to Red
+                send the last created embed to event-channel with "Ares"
+            if arg 1 is not set:
+                create embed:
+                    set author info of the embed to "Punishments"
+                    set the title of embed to title with text "A Username is required to kick!"
+                    set color of the embed to Red
+                send the last created embed to event-channel with "Ares"
+            else:
+                set {_username} to arg 1 parsed as player
+                set {_kicker} to "%event-user%##%discriminator of event-user%"
+                set {_reason} to arg 2
+                broadcast "&c<!> &c%{_kicker}%&c has kicked &c%{_username}% &cfor &c%{_reason}%&c."
+                add "&7[%now%] &c%{_kicker}% &7kicked &c%{_username}% &7Reason: &c%{_reason}%" to {%arg 1's uuid%::punishments::*}
+                kick {_username} due to "&cKicked By: %{_kicker}%%nl%Reason: %{_reason}%"
+                create embed:
+                    set author info of the embed to "Punishments"
+                    set the title of embed to title with text "Staff Member: %{_kicker}% | Reported Player: %arg 1%"
+                    add field named "Reason" with value "%{_reason}%" to the embed
+                    set color of the embed to Red
+                send the last created embed to event-channel with "Ares"
+        else:
+            create embed:
+                set author info of the embed to "Punishments"
+                set the title of embed to title with text "No Permission!"
+                set color of the embed to Red
+            send the last created embed to event-channel with "Ares"
+
+# Generator System
+
+command /getgen:
+    permission: gungen.getgen
+    permission message: {@NoPerm}
+    trigger:
+        open virtual chest inventory with size 6 named "&a&lGenerator System" to player
+        loop integers from 0 to 9:
+            create a gui slot loop-number of player with gray stained glass pane named "&8"
+        loop integers from 45 to 53:
+            create a gui slot loop-number of player with gray stained glass pane named "&8"
+        create a gui slot 17 of player with gray stained glass pane named "&8"
+        create a gui slot 26 of player with gray stained glass pane named "&8"
+        create a gui slot 35 of player with gray stained glass pane named "&8"
+        create a gui slot 18 of player with gray stained glass pane named "&8"
+        create a gui slot 27 of player with gray stained glass pane named "&8"
+        create a gui slot 36 of player with gray stained glass pane named "&8"
+        create a gui slot 10 of player with sea lantern named "&f&lGunpowder Generator" to run:
+            getGen("Gunpowder", player)
+        create a gui slot 11 of player with sea lantern named "&f&lCoal Generator" to run:
+            getGen("Coal", player)
+        create a gui slot 12 of player with sea lantern named "&f&lGold Generator" to run:
+            getGen("Gold", player)
+        create a gui slot 34 of player with sea lantern named "&f&lBook Generator" to run:
+            getGen("Book", player)
+        create a gui slot 13 of player with sea lantern named "&f&lIron Generator" to run:
+            getGen("Iron", player)
+        create a gui slot 14 of player with sea lantern named "&f&lPacked Ice Generator" to run:
+            getGen("Packed Ice", player)
+        create a gui slot 15 of player with sea lantern named "&f&lFire Charge Generator" to run:
+            getGen("Fire Charge", player)
+        create a gui slot 16 of player with sea lantern named "&f&lPurpur Block Generator" to run:
+            getGen("Purpur Block", player)
+        create a gui slot 19 of player with sea lantern named "&f&lRedstone Generator" to run:
+            getGen("Redstone", player)
+        create a gui slot 20 of player with sea lantern named "&f&lNetherwart Generator" to run:
+            getGen("Netherwart", player)
+        create a gui slot 21 of player with sea lantern named "&f&lTNT Generator" to run:
+            getGen("TNT", player)
+        create a gui slot 22 of player with sea lantern named "&f&lSlime Ball Generator" to run:
+            getGen("Slime Ball", player)
+        create a gui slot 23 of player with sea lantern named "&f&lBedrock Generator" to run:
+            getGen("Bedrock", player)
+        create a gui slot 24 of player with sea lantern named "&f&lObsidian Generator" to run:
+            getGen("Obsidian", player)
+        create a gui slot 25 of player with sea lantern named "&f&lBlaze Powder Generator" to run:
+            getGen("Blaze Powder", player)
+        create a gui slot 28 of player with sea lantern named "&f&lGray Dye Generator" to run:
+            getGen("Gray Dye", player)
+        create a gui slot 29 of player with sea lantern named "&f&lFirework Star Generator" to run:
+            getGen("Firework Star", player)
+        create a gui slot 30 of player with sea lantern named "&f&lEmerald Generator" to run:
+            getGen("Emerald", player)
+        create a gui slot 31 of player with sea lantern named "&f&lBlue Dye Generator" to run:
+            getGen("Blue Dye", player)
+        create a gui slot 32 of player with sea lantern named "&f&lDiamond Generator" to run:
+            getGen("Diamond", player)
+        create a gui slot 33 of player with sea lantern named "&f&lCompressed Ice Generator" to run:
+            getGen("Compressed Ice", player)
+        create a gui slot 34 of player with sea lantern named "&f&lCactus Generator" to run:
+            getGen("Cactus", player)
+
+function getGen(gen: string, p: player):
+    if {_gen} is "Gunpowder":
+        give 1 sea lantern named "&7&lGunpowder Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a gunpowder generator" to {_p}
+    if {_gen} is "Coal":
+        give 1 sea lantern named "&0&lCoal Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a coal generator" to {_p}
+    if {_gen} is "Gold":
+        give 1 sea lantern named "&6&lGold Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a gold generator" to {_p}
+    if {_gen} is "Cactus":
+        give 1 sea lantern named "&a&lCactus Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a cactus generator" to {_p
+    if {_gen} is "Book":
+        give 1 sea lantern named "&f&lBook Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a book generator" to {_p}
+    if {_gen} is "Iron":
+        give 1 sea lantern named "&f&lIron Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a iron generator" to {_p}
+    if {_gen} is "Packed Ice":
+        give 1 sea lantern named "&b&lPacked Ice Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a packed ice generator" to {_p}
+    if {_gen} is "Prismarine":
+        give 1 sea lantern named "&b&lPrismarine Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a prismarine generator" to {_p}
+    if {_gen} is "Fire Charge":
+        give 1 sea lantern named "&c&lFire Charge Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a fire charge generator" to {_p}
+    if {_gen} is "Purpur Block":
+        give 1 sea lantern named "&d&lPurpur Block Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a purpur block generator" to {_p}
+    if {_gen} is "Redstone":
+        give 1 sea lantern named "&c&lRedstone Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a redstone generator" to {_p}
+    if {_gen} is "Netherwart":
+        give 1 sea lantern named "&c&lNetherwart Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a netherwart generator" to {_p}
+    if {_gen} is "TNT":
+        give 1 sea lantern named "&c&lTNT Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a tnt generator" to {_p}
+    if {_gen} is "Slime Ball":
+        give 1 sea lantern named "&a&lSlime Ball Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a slime ball generator" to {_p}
+    if {_gen} is "Bedrock":
+        give 1 sea lantern named "&7&lBedrock Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a bedrock generator" to {_p}
+    if {_gen} is "Obsidian":
+        give 1 sea lantern named "&0&lObsidian Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a obsidian generator" to {_p}
+    if {_gen} is "Blaze Powder":
+        give 1 sea lantern named "&6&lBlaze Powder Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a blaze powder generator" to {_p}
+    if {_gen} is "Gray Dye":
+        give 1 sea lantern named "&8&lGray Dye Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a gray dye generator" to {_p}
+    if {_gen} is "Firework Star":
+        give 1 sea lantern named "&c&lFirework Star Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a firework star generator" to {_p}
+    if {_gen} is "Emerald":
+        give 1 sea lantern named "&a&lEmerald Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a emerald generator" to {_p}
+    if {_gen} is "Blue Dye":
+        give 1 sea lantern named "&9&lBlue Dye Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a blue dye generator" to {_p}
+    if {_gen} is "Diamond":
+        give 1 sea lantern named "&b&lDiamond Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a diamond generator" to {_p}
+    if {_gen} is "Compressed Ice":
+        give 1 sea lantern named "&b&lCompressed Ice Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a compressed ice generator" to {_p}
+
+on block place of sea lantern:
+    set {_loc} to event-block's location
+    add 0.5 to y-coordinate of {_loc}
+    if name of player's held item contains "Coal Generator":
+        add {_loc} to {gens::coal::*}
+        add "&7[&c%now%&7] &c%{_p}%&7 placed a Coal Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Coal Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Gunpowder Generator":
+        add {_loc} to {gens::gp::*}
+        add "&7[&c%now%&7] &c%{_p}%&7 placed a Gunpowder Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Gunpowder Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Cactus Generator":
+        add {_loc} to {gens::gp::*}
+        add "&7[&c%now%&7] &c%{_p}%&7 placed a Cactus Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Cactus Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Gold Generator":
+        add {_loc} to {gens::gold::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Gold Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Gold Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Book Generator":
+        add {_loc} to {gens::book::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Book Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Book Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Iron Generator":
+        add {_loc} to {gens::iron::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Iron Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Iron Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Packed Ice Generator":
+        add {_loc} to {gens::pi::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Packed Ice Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Ice Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Prismarine Generator":
+        add {_loc} to {gens::pris::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Prismarine Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Prismarine Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Fire Charge Generator":
+        add {_loc} to {gens::fc::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Fire Charge Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Fire Charge Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Purpur Block Generator":
+        add {_loc} to {gens::purpur::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Purpur Block Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Purpur Block Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Redstone Generator":
+        add {_loc} to {gens::redstone::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Redstone Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Redstone Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Netherwart Generator":
+        add {_loc} to {gens::nw::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Netherwart Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Netherwart Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "TNT Generator":
+        add {_loc} to {gens::tnt::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a TNT Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 TNT Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Slime Ball Generator":
+        add {_loc} to {gens::slime::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Slime Ball Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Slime Ball Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Bedrock Generator":
+        add {_loc} to {gens::bedrock::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Bedrock Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Bedrock Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Obsidian Generator":
+        add {_loc} to {gens::obsidian::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Obsidian Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Obsidian Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Blaze Powder Generator":
+        add {_loc} to {gens::bp::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Blaze Powder Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Blaze Powder Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Gray Dye Generator":
+        add {_loc} to {gens::gd::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Gray Dye Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Gray Dye Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Firework Star Generator":
+        add {_loc} to {gens::fs::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Firework Star Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Firework Star Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Emerald Generator":
+        add {_loc} to {gens::em::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Emerald Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Emerald Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Blue Dye Generator":
+        add {_loc} to {gens::bd::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Blue Dye Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Blue Dye Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Diamond Generator":
+        add {_loc} to {gens::dia::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Diamond Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Diamond Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Compressed Ice Generator":
+        add {_loc} to {gens::ci::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Compressed Ice Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Compressed Ice Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+
+on block break of sea lantern:
+    set {_loc} to event-block's location
+    add 0.5 to y-coordinate of {_loc}
+    if {gens::coal::*} contains {_loc}:
+        remove {_loc} from {gens::coal::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Coal Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Coal Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::gp::*} contains {_loc}:
+        remove {_loc} from {gens::gp::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Gunpowder Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Gunpowder Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::cactus::*} contains {_loc}:
+        remove {_loc} from {gens::cactus::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Cactus Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Cactus Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::gold::*} contains {_loc}:
+        remove {_loc} from {gens::gold::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Gold Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Gold Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::book::*} contains {_loc}:
+        remove {_loc} from {gens::book::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Book Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Book Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::iron::*} contains {_loc}:
+        remove {_loc} from {gens::iron::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Iron Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Iron Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::pi::*} contains {_loc}:
+        remove {_loc} from {gens::pi::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Packed Ice Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Ice Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::pris::*} contains {_loc}:
+        remove {_loc} from {gens::pris::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Prismarine Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Prismarine Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::fc::*} contains {_loc}:
+        remove {_loc} from {gens::fc::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Fire Charge Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Fire Charge Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::purpur::*} contains {_loc}:
+        remove {_loc} from {gens::purpur::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Purpur Block Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Purpur Block Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::redstone::*} contains {_loc}:
+        remove {_loc} from {gens::redstone::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Redstone Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Redstone Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::nw::*} contains {_loc}:
+        remove {_loc} from {gens::nw::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Netherwart Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Netherwart Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::tnt::*} contains {_loc}:
+        remove {_loc} from {gens::tnt::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a TNT Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 TNT Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::slime::*} contains {_loc}:
+        remove {_loc} from {gens::slime::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Slime Ball Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Slime Ball Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::bedrock::*} contains {_loc}:
+        remove {_loc} from {gens::bedrock::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Bedrock Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Bedrock Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::obsidian::*} contains {_loc}:
+        remove {_loc} from {gens::obsidian::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Obsidian Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Obsidian Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::bp::*} contains {_loc}:
+        remove {_loc} from {gens::bp::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Blaze Powder Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Blaze Powder Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::gd::*} contains {_loc}:
+        remove {_loc} from {gens::gd::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Gray Dye Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Gray Dye Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::fs::*} contains {_loc}:
+        remove {_loc} from {gens::fs::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Firework Star Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Firework Star Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::em::*} contains {_loc}:
+        remove {_loc} from {gens::em::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Emerald Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Emerald Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::bd::*} contains {_loc}:
+        remove {_loc} from {gens::bd::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Blue Dye Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Blue Dye Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::dia::*} contains {_loc}:
+        remove {_loc} from {gens::dia::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Diamond Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Diamond Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::ci::*} contains {_loc}:
+        remove {_loc} from {gens::ci::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Compressed Ice Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved 1 Compressed Ice Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+
+every 1 second:
+    drop 1 coal at {gens::coal::*} without velocity
+    drop 1 gunpowder at {gens::gp::*} without velocity
+    drop 1 cactus at {gens::cactus::*} without velocity
+    drop 1 gold ingot at {gens::gold::*} without velocity
+    drop 1 book at {gens::book::*} without velocity
+    drop 1 iron ingot at {gens::iron::*} without velocity
+    drop 1 packed ice at {gens::pi::*} without velocity
+    drop 1 prismarine shard at {gens:pris::*} without velocity
+    drop 1 fire charge at {gens::fc::*} without velocity
+    drop 1 purpur block at {gens::purpur::*} without velocity
+    drop 1 redstone at {gens::redstone::*} without velocity
+    drop 1 netherwart at {gens::nw::*} without velocity
+    drop 1 tnt at {gens::tnt::*} without velocity
+    drop 1 slime ball at {gens::slime::*} without velocity
+    drop 1 bedrock at {gens::bedrock::*} without velocity
+    drop 1 obsidian at {gens::obby::*} without velocity
+    drop 1 blaze powder at {gens::bp::*} without velocity
+    drop 1 gray dye at {gens::gd::*} without velocity
+    drop 1 firework star at {gens::fs::*} without velocity
+    drop 1 emerald at {gens::em::*} without velocity
+    drop 1 blue dye at {gens::bd::*} without velocity
+    drop 1 diamond at {gens::dia::*} without velocity
+    drop 1 packed ice named "Compressed Ice" at {gens::ci::*} without velocity
+
+# Upgrades System
+
+on rightclick on entity:
+    if clicked entity is a citizen:
+        if name of entity is "&a&lUpgrades":
+            open virtual chest inventory with size 6 named "&a&lUpgrades" to player
+
+# Maintenance Mode
+
+command /maintenance:
+    permission: gungen.maintenance, gungen.*
+    permission message: {@PermissionDenied}
+    trigger:
+        open virtual chest inventory with size 1 named "&6&lMaintenance Mode" to player
+        create a gui slot 0 of player with gray glass pane
+        create a gui slot 1 of player with gray glass pane
+        create a gui slot 2 of player with gray glass pane
+        create a gui slot 3 of player with gray glass pane
+        create a gui slot 5 of player with gray glass pane
+        create a gui slot 6 of player with gray glass pane
+        create a gui slot 7 of player with gray glass pane
+        create a gui slot 8 of player with gray glass pane
+        maintenanceGui(player)
+
+function maintenanceGui(p: player):
+    if {server::maintenancemode} is true:
+        create a gui slot 4 of {_p} with red concrete named "&c&lClick to De-activate Maintenance mode" to run function maintenanceMode("Off")
+    else:
+        create a gui slot 4 of {_p} with green concrete named "&a&lClick to Activate Maintenance mode" to run function maintenanceMode("On")
+
+function maintenanceMode(status: String):
+    if {_status} is "On":
+        set {server::maintenancemode} to true
+        broadcast " "
+        broadcast "&7[&4&lAlert&7] &7Maintenance mode has been &aEnabled"
+        broadcast " "
+    if {_status} is "Off":
+        set {server::maintenancemode} to false
+        broadcast " "
+        broadcast "&7[&4&lAlert&7] &7Maintenance mode has been &4Disabled"
+        broadcast " "
+
+
+# Lightning Tools
+
+on right click holding a blaze rod:
+    if name of tool of player is "&6&lLightning Staff &8I":
+        if {lightningdelay::%uuid of player%} is not 1:
+            if player's inventory has 1 firework star named "&f&lLightning Stone&r":
+                remove 1 firework star named "&f&lLightning Stone&r" from player's inventory
+                set {_loc} to location of targeted block
+                play sound "entity_ghast_shoot" with volume 10 and pitch 2 at player
+                strike lightning at {_loc}
+                set {lightningdelay::%uuid of player%} to 1
+                wait 1 seconds
+                set {lightningdelay::%uuid of player%} to 0
+                play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+
+# Moderation Tools
+
+command /warn [<offline player>] [<text>]:
+    permission: gungen.warn
+    permission message: {@NoPerm}
+    trigger:
+        if arg-1 is not set:
+            if arg-2 is not set:
+                send "&7/warn <player> <reason>"
+        else if arg-1 is set:
+            if arg-2 is set:
+                if arg-1 is a player:
+                    send "&c<!> %player% &cwarned &c%arg-1% &cfor &c%arg-2%&c.%nl% " to all players
+                    add "&7[%now%] &c%player% &7warned &c%arg-1% &7Reason: &c%arg-2%" to {%arg-1's uuid%::punishments::*}
+                else:
+                    send "&bc%arg-1% &7is not a player!"
+
+command /history [<offline player>]:
+    permission: gungen.history
+    permission message: {@NoPerm}
+    trigger:
+        if arg-1 is not set:
+            send "&7/history <player>"
+        else:
+            loop {%arg-1's uuid%::punishments::*}:
+                add "%loop-value%%nl%&7" to {_p::*}
+            set {_p2} to "%{_p::*}%"
+            replace all ", " and " and" with "" in {_p2}
+            set {_p2} to "&7No Punishments" if {_p2} is "<none>"
+            send ""
+            send "&c%arg 1%&7's Punishments"
+            send "%{_p2}%"
+            send ""
+
+on command:
+    if command is "minecraft:me":
+        cancel event
+
+every 5 seconds in "ul_GunGen":
+    loop all players:
+        if gamemode of loop-player is creative:
+            if loop-player doesn't have permission "essentials.gamemode":
+                set gamemode of loop-player to adventure
+                if loop-player has permission "gungen.staffchat.see":
+                    send "&7[&cSTAFF&7] &7%loop-player% gamemode was changed to adventure due to them being in survival"
+
+command /chat [<text>]:
+    permission: gungen.chat
+    trigger:
+        open virtual chest inventory with size 1 named "&a&lChat Moderation" to player
+        create a gui slot 4 of player with white concrete named "&f&lChat Clear" to run function chat(player, "Clear")
+        create a gui slot 2 of player with yellow concrete named "&f&lChat Mute" to run function chat(player, "Mute")
+
+on chat:
+    if first character of message is "##":
+        if player has permission "gungen.staffchat":
+            cancel event
+            loop all players:
+                if loop-player has permission "gungen.staffchat.see":
+                    replace every "##" with "" in the message
+                    send "&7[&cSTAFF&7] &c%player%&7: &a%message%" to loop-player
+        else:
+            cancel event
+            send "{@NoPerm}" to player
+    if {gungen.chat.muted} is true:
+        if player has permission "gungen.chat.bypass":
+            cancel event
+            broadcast "&7%player'% &7%colored message%"
+        else:
+            cancel event
+            send "&7Chat is currently muted!" to player
+    if {server::chat::muted} is true:
+        if player has permission "gungen.chatbypass":
+            send "%player's prefix%&c%player%&7: &c%message%" to all players
+            cancel event
+        else:
+            send "&cYou can't talk while chat is muted!" to player
+            cancel event
+
+command /kick [<player>] [<text>]:
+    permission: gungen.kick
+    permission message: &8[&6Gun Gens&8] &cNo Permission.
+    trigger:
+        if arg 1 is set:
+            if arg 2 is set:
+                set {_kicked} to arg 1
+                if {_kicked} does not have permission "Gungens.staff.kickbypass":
+                    set {_reason} to arg 2
+                    set {_kickedby} to player
+                    add "&7[%now%] &c%{_kickedby}% &7kicked &c%{_kicked}% &7Reason: &c%{_reason}%" to {%arg-1's uuid%::punishments::*}
+                    kick {_kicked} due to "&cKicked By: %player%%nl%Reason: %{_reason}%"
+                    broadcast "&c<!> &c%{_kickedby}%&c has kicked &c%{_kicked}% &cfor &c%{_reason}%&c."
+                else:
+                    send "&cYou cannot kick that player!"
+            else:
+                send "&b/kick &c<player> &c<reason>"
+        else:
+            send "&b/kick &c<player> &c<reason>"
+
+command /reloadargon:
+    permission: gungen.reloadac
+    permission message: {@PermissionDenied}
+    trigger:
+        broadcast "&c<!> &cReloading Core Script..."
+        broadcast "&c<!> &cYou may experience a bit of lag."
+        wait 2 second
+        make console execute command "/sk reload argoncore"
+
+command /report [<player>] [<text>]:
+    trigger:
+        if arg 1 is not set:
+            send "&cUsage: /report <player> <reason>" to player
+        if arg 1 is set:
+            if arg 2 is set:
+                loop all players:
+                    if loop-player has permission "gungen.staffchat.see":
+                        send "&7[&cSTAFF&7] &c%player%&7 has reported &c%arg 1%&7 for &c%arg 2%" to loop-player
+                create embed:
+                    set author info of the embed to "Player Reports"
+                    set the title of embed to title with text "Reporting Player: %player% | Reported Player: %arg 1%"
+                    add field named "Reason" with value "%arg 2%" to the embed
+                    set color of the embed to Red
+                send the last created embed to channel with id "708846009387581514" with "Ares"
+                send "&7[&cREPORTS&7] &7Report submitted" to player
+
+function chat(p: player, type: String):
+    close {_p}'s inventory
+    if {_type} is "Clear":
+        loop 1000 times:
+            send " " to all players
+        send "&7Chat was cleared by &b%{_p}%" to all players
+        if {_type} is "Mute":
+            if {server::chat::muted} is true:
+                send "&7Chat has been unmuted by &b%{_p}%" to all players
+                set {server::chat::muted} to false
+            else:
+                send "&7Chat has been muted by &b%{_p}%" to all players
+                set {server::chat::muted} to true
+
+function toTimespan(t: text) :: timespan:
+    set {_conversion::s} to "seconds"
+    set {_conversion::m} to "minutes"
+    set {_conversion::h} to "hours"
+    set {_conversion::d} to "days"
+    set {_conversion::mo} to "months"
+    set {_conversion::y} to "years"
+    set {_l} to length of {_t}
+    set {_a} to 1 if {_l} is 2
+    set {_a} to 2 if {_l} is 3
+    set {_l::1} to first {_a} characters of {_t}
+    set {_l::2} to last character of {_t}
+    set {_t} to "%{_l::1}% %{_conversion::%{_l::2}%}%"
+    return ({_t} parsed as timespan)
+
+command /ban [<offline player>] [<text>]:
+    permission: gungen.ban
+    permission message: &8[&6Gun Gens&8] &cNo Permission.
+    trigger:
+        if arg 1 is set:
+            if arg 2 is set:
+                set {_banned} to arg 1
+                if {_banned} does not have permission "Gungens.staff.banbypass":
+                    set {_reason} to arg 2
+                    set {_bannedby} to player
+                    add "&7[%now%] &c%{_bannedby}% &7banned &c%{_banned}% &7Reason: &c%{_reason}%" to {%arg-1's uuid%::punishments::*}
+                    ban {_banned} because "&cBanned By: %player%%nl%Reason: %{_reason}%"
+                    kick {_banned} due to "&cBanned By: %player%%nl%Reason: %{_reason}%"
+                    broadcast "&c<!> &c%{_bannedby}%&c has banned &c%{_banned}% &cfor &c%{_reason}%&c. &c[&cPERM&c]"
+                else:
+                    send "&cYou cannot ban that player!"
+            else:
+                send "&b/ban &c<player> &c<reason>"
+        else:
+            send "&b/ban &c<player> &c<reason>"
+
+command /tempban [<offline player>] [<text>] [<text>]:
+    permission: gungen.tempban
+    permission message: &8[&6Gun Gens&8] &cNo Permission.
+    trigger:
+        if arg 1 is set:
+            if arg 2 is set:
+                if arg 3 is set:
+                    set {_banned} to arg 1
+                    if {_banned} does not have permission "Gungens.staff.banbypass":
+                        set {_bannedby} to player
+                        set {_reason} to arg 3
+                        set {_time} to toTimespan(arg 2)
+                        add arg 1's uuid to {banned::*}
+                        set {ban::time::%arg 1's uuid%} to {_time} from now
+                        ban {_banned} due to "&cBanned By: %player%%nl%Banned for: %{_time}%%nl%Reason: %{_reason}%"
+                        kick {_banned} due to "&cBanned By: %player%%nl%Banned for: %{_time}%%nl%Reason: %{_reason}%"
+                        broadcast "&c<!> &c%{_bannedby}%&c has banned &c%{_banned}% &cfor &c%{_reason}%&c. &c[&c%{_time}%&c]"
+                    else:
+                        send "&cYou cannot ban that player!"
+                else:
+                    send "&b/tempban &c<player> <time> <s:m:h:d:w:mo:y> &c<reason>"
+            else:
+                send "&b/tempban &c<player> <time> <s:m:h:d:w:mo:y> &c<reason>"
+        else:
+            send "&b/tempban &c<player> <time> <s:m:h:d:w:mo:y> &c<reason>"
+
+command /mute [<offline player>] [<text>] [<text>]:
+    permission: gungen.mute
+    permission message: {@NoPerm}
+    trigger:
+        if arg-1 has permission "gungen.mute.bypass":
+            send "&cThis player cannot be muted!"
+        else:
+            if arg-1 is not set:
+                send "&7/mute <player> <time/forever> <reason>"
+            else if arg-2 is not set:
+                send "&7/mute <player> <time/forever> <reason>"
+            else if arg-3 is not set:
+                send "&7/mute <player> <time/forever> <reason>"
+            else:
+                if arg-2 is "forever":
+                    send "&c<!> &c%player% &cmuted &c%arg-1% &cfor &c%arg-3% &c[FOREVER]"
+                    add "&7[%now%] &c%player% &7muted &c%arg-1% &7Reason: &c%arg-3% &7[FOREVER]%nl% " to {%arg-1's uuid%::punishments::*}
+                    set {mute::%arg-1's uuid%} to "&7You are currently muted%nl% &7Muted By: &c%player%%nl% &7Reason: &c%arg-3%%nl%  &7Time Muted: &c%now%%nl% "
+                else:
+                    set {_time} to toTimespan(arg-2)
+                    if {_time} is not set:
+                        send "&cInvalid Time"
+                    else:
+                        send "&c%player% &7muted &c%arg-1% &7for &b%arg-3% &7[%{_time}%]"
+                        add "&7[%now%] &c%player% &7muted &c%arg-1% &7Reason: &c%arg-3% &7[%{_time}%]" to {%arg-1's uuid%::punishments::*}
+                        set {mute::%arg-1's uuid%} to "&7You are currently muted%nl% &7Muted By: &c%player%%nl% &7Reason: &c%arg-3%%nl% &7Mute Length: &c%{_time}%%nl% &7Time Muted: &c%now%%nl% "
+                        set {mutet::%arg-1's uuid%} to {_time} from now
+                        set {mutet2::%arg-1's uuid%} to {_time}
+
+command /unmute [<offlineplayer>]:
+    permission: gungen.mute
+    permission message: {@NoPerm}
+    trigger:
+        if {mute::%arg-1's uuid%} is not set:
+            send "&cThis player is not muted!"
+        else:
+            if arg-1 is not a player:
+                send "&c%arg-1% &7is not a player!"
+            else if arg-1 is not set:
+                send "&7/unmute <player>"
+            else:
+                add "&7[%now%] &c%player% &7unmuted &c%arg-1%" to {%arg-1's uuid%::punishments::*}
+                delete {mute::%arg-1's uuid%}
+
+every second:
+    loop {banned::*}:
+        if difference between {ban::time::%loop-value%} and now is less than 1 second:
+            delete {ban::time::%loop-value%}
+            unban loop-value
+    loop all players:
+        {mute::%loop-player's uuid%} is set
+        {mutet::%loop-player's uuid%} is set
+        if difference between {mutet::%loop-player's uuid%} and now is less than 1 second:
+            send "&7You have been unmuted!" to loop-player
+            delete {mute::%loop-player's uuid%}
+            delete {mutet::%loop-player's uuid%}
+            delete {mutet2::%loop-player's uuid%}
+    wait 1 second
+
+command /unban [<offline player>]:
+    permission: Gungens.staff.ban
+    permission message: &8{&6Gun Gens&8] &cNo Permission.
+    trigger:
+        if arg 1 is set:
+            set {_banned} to arg 1
+            unban {_banned}
+            if {ban::time::%arg 1's uuid%} is set:
+                delete {ban::time::%arg-1's uuid%}
+            add "&7[%now%] &c%player% &7unbanned &c%{_banned}%" to {%arg-1's uuid%::punishments::*}
+            broadcast "&c<!> &c%player%&c has unbanned &c%{_banned}%&c."
+        else:
+            send "&b/unban &c<player>"
+
+
+# Grappling Hook
+
+on player fishing:
+    if name of tool of player is "&6Grappling Hook":
+        if fishing state is Failed Attempt or in ground:
+            push player (direction from player to location of hook) at speed 5
+            push player up at speed 1
+
+# Level System
+
+every 5 seconds in "ul_GunGen":
+    loop all players:
+        if {%loop-player's uuid%::xp} >= {%loop-player's uuid%::xpincrement}:
+            remove {%loop-player's uuid%::xpincrement} from {%loop-player's uuid%::xp}
+            add 5 to {%loop-player's uuid%::xpincrement}
+            add 1 to {%loop-player's uuid%::level}
+            send "&7[&6LEVEL&7] You leveled up to %{%loop-player's uuid%::level}%" to loop-player
+    wait 1 seconds
+
+on death:
+  if attacker is a player:
+    if victim is a player:
+      add 1 to {%attacker's uuid%::xp}
+      send "&a+1 &aXP" to attacker
+
+# Statistics
+
+command /stats [<player>]:
+    trigger:
+        if arg 1 is not set:
+            send centered "&6%player%&6's Statistics" to player
+            send centered "&6Prestige: &7%{%player's uuid%::prestige}%" to player
+            send centered "&6Level: &7%{%player's uuid%::level}%" to player
+            send centered "&6XP: &7%{%player's uuid%::xp}%&7/%{%player's uuid%::xpincrement}%" to player
+        else:
+            send centered "&6%arg 1%&6's Statistics" to player
+            send centered "&6Prestige: &7%{%arg 1's uuid%::prestige}%" to player
+            send centered "&6Level: &7%{%arg 1's uuid%::level}%" to player
+            send centered "&6XP: &7%{%arg 1's uuid%::xp}%&7/%{%arg 1's uuid%::xpincrement}%" to player
+
+# Prestige System
+
+command /prestige:
+    trigger:
+        if {%player's uuid%::level} >= 100:
+            open virtual chest inventory with size 1 named "&a&lPrestige Confirmation" to player
+            create a gui slot 4 of player with green stained glass pane named "&aClick here to confirm prestige!" to run function prestige(player)
+            create a gui slot 0 of player with gray stained glass pane named "&8"
+            create a gui slot 1 of player with gray stained glass pane named "&8"
+            create a gui slot 2 of player with gray stained glass pane named "&8"
+            create a gui slot 3 of player with gray stained glass pane named "&8"
+            create a gui slot 5 of player with gray stained glass pane named "&8"
+            create a gui slot 6 of player with gray stained glass pane named "&8"
+            create a gui slot 7 of player with gray stained glass pane named "&8"
+            create a gui slot 8 of player with gray stained glass pane named "&8"
+        else:
+            send "&c&m                                                                " to player
+            send centered "&dYou don't have the required level to prestige" to player
+            send centered "&dRequired Level: 100" to player
+            send "&c&m                                                                " to player
+
+function prestige(p: player):
+    set {_uuid} to {_p}'s uuid
+    add 1 to {%{_uuid}%::prestige}
+    set {%{_uuid}%::level} to 0
+    set {%{_uuid}%::xpincrement} to 5
+    make console execute command "/ccrate give physical Gun 1 %{_p}%"
+    send "&c&m                                                                " to {_p}
+    send centered "          &d&kIII &r&c&lPRESTIGE! &d&kIII&r" to {_p}
+    send centered "&7 " to {_p}
+    send centered "       &dYou are now &cPrestige &3%{%{_uuid}%::prestige}%&7!" to {_p}
+    send centered "&d+1 Rare Crate Keys" to {_p}
+    send "&c&m                                                                " to {_p}
+    play sound "ui.toast.challenge_complete" with volume 10 and pitch 1 at {_p}
+    close {_p}'s inventory
+
+
+command /levelset <player> <number>:
+    permission: levelset
+    trigger:
+        if arg 1 is set:
+            if arg 2 is set:
+                set {%arg-1's uuid%::level} to arg 2
+
+command /addxp <player> <number>:
+    permission: levelset
+    trigger:
+        if arg 1 is set:
+            if arg 2 is set:
+                add arg 2 to {%arg-1's uuid%::xp}
+                send "&a%player% has added &a%arg 2% XP to your account." to arg 1
+
+# Chat
+
+on chat:
+    replace all "&" with " " in message
+    replace all "Nigga" with "&kNigga" in message
+    replace all "Nigger" with "&kNigger" in message
+    set chat format to colored "&8[&3%{%player's uuid%::prestige}%✫&8] &8[&9%{%player's uuid%::level}%&8] %player's prefix%%player's displayname%%player's suffix%&7: %{%player's uuid%::chatcolor}%%message%"
+
+
+command /setchatcolor <text>:
+    permission: argon.chatcolor
+    permission message: {@PermissionDenied}
+    trigger:
+        set {%player's uuid%::chatcolor} to arg 1
+
+command /chatcolor:
+    trigger:
+        open virtual chest inventory with size 3 named "&a&lChange Chat Color" to player
+        loop integers from 0 to 8:
+            create a gui slot loop-number of player with gray stained glass pane named "&8"
+        create a gui slot 9 of player with gray stained glass pane named "&8"
+        create a gui slot 17 of player with gray stained glass pane named "&8"
+        loop integers from 18 to 26:
+            create a gui slot loop-number of player with gray stained glass pane named "&8"
+        create a gui slot 10 of player with gray concrete named "&7Default" with lore "&7Click to enable default chat color" to run:
+            setcColor("&7", player)
+            send "&7Set chat color to: &7Default" to player
+            close player's inventory
+        create a gui slot 11 of player with white concrete named "&fWhite" with lore "&7Click to enable white chat color" to run:
+            if player has permission "vip":
+                setcColor("&f", player)
+                send "&7Set chat color to: &fWhite" to player
+                close player's inventory
+            else:
+                send "&cYou dont have permission to do this!" to player
+                close player's inventory
+        create a gui slot 12 of player with yellow concrete named "&eYellow" with lore "&7Click to enable yellow chat color" to run:
+            if player has permission "legend":
+                setcColor("&e", player)
+                send "&7Set chat color to: &eYellow" to player
+                close player's inventory
+            else:
+                send "&cYou dont have permission to do this!" to player
+                close player's inventory
+        create a gui slot 13 of player with pink concrete named "&dLight Purple" with lore "&7Click to enable light purple chat color" to run:
+            if player has permission "mythic":
+                setcColor("&d", player)
+                send "&7Set chat color to: &dLight Purple" to player
+                close player's inventory
+            else:
+                send "&cYou dont have permission to do this!" to player
+                close player's inventory
+        create a gui slot 14 of player with cyan concrete named "&bAqua" with lore "&7Click to enable aqua chat color" to run:
+            if player has permission "titan":
+                setcColor("&b", player)
+                send "&7Set chat color to: &bAqua" to player
+                close player's inventory
+            else:
+                send "&cYou dont have permission to do this!" to player
+                close player's inventory
+
+function setcColor(color: string, p: player):
+    set {_uuid} to {_p}'s uuid
+    set {%{_uuid}%::chatcolor} to {_color}
+
+# Broadcast
+
+command /broadcast [<text>]:
+    aliases: /announce, /bc, /broadcast
+    permission: hydra.broadcast, hydra.*
+    permission message: {@PermissionDenied}
+    trigger:
+        broadcast " "
+        broadcast "&7[&6GunGens&7] &7%colored arg-1%"
+        broadcast " "
