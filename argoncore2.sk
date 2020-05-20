@@ -126,7 +126,7 @@ on quit:
         send "%player% has quit" to {chatChannel} with "Ares"
 
 on load:
-    login to "NzA3NzUwODEzNjE5MTkxODE4.XsV_7g.WRe1NIFkvT51MAgvIkBBJQvL1WA" with the name "Ares"
+    login to "tokenhere" with the name "Ares"
     wait 5 seconds
     set {channel} to channel with id "{@logChannel}"
     set {chatChannel} to channel with id "{@chatChannel}"
