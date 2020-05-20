@@ -727,7 +727,21 @@ command /warn [<offline player>] [<text>]:
                     add "&7[%now%] &c%player% &7warned &c%arg-1% &7Reason: &c%arg-2%" to {%arg-1's uuid%::punishments::*}
                 else:
                     send "&bc%arg-1% &7is not a player!"
-
+command /sendgulag <player> <text> <text>:
+  permission: Gungens.gulag
+  permission message: &cNo Permission!
+  trigger:
+    if arg 1 is set:
+      if arg 2 is set:
+        if arg-1 does not have permission "Gungens.gulagbypass":
+          send "&c%arg-1% &bjailed!"
+          execute console command "/jail %arg-1% gualg%arg-2% %arg-3%"
+        else:
+          send "&cYou cannot Gulag that player!"
+      else:
+        send "&b/gulag &c<player> <gulagnumber> <time>"
+    else:
+      send "&b/gulag &c<player> <gulagnumber> <time>"
 command /history [<offline player>]:
     permission: gungen.history
     permission message: {@NoPerm}
@@ -772,6 +786,13 @@ on chat:
                 if loop-player has permission "gungen.staffchat.see":
                     replace every "##" with "" in the message
                     send "&7[&cSTAFF&7] &c%player%&7: &a%message%" to loop-player
+    if first character of message is "!":
+        if player has permission "gungen.helperstaffchat":
+            cancel event
+            loop all players:
+                if loop-player has permission "gungen.helperstaffchat.see":
+                    replace every "!" with "" in the message
+                    send "&7[&eSTAFF&7] &e%player%&7: &3%message%" to loop-player
         else:
             cancel event
             send "{@NoPerm}" to player
