@@ -126,8 +126,7 @@ on quit:
         send "%player% has quit" to {chatChannel} with "Ares"
 
 on load:
-    set {_token} to "NzA3NzUwODEzNjE5MTkxODE4.XrNWeA.r52FFSBy558QEEDBfwQgzKyvre0"
-    login to "NzA3NzUwODEzNjE5MTkxODE4.XrNWeA.r52FFSBy558QEEDBfwQgzKyvre0" with the name "Ares"
+    login to "NzA3NzUwODEzNjE5MTkxODE4.XsV_7g.WRe1NIFkvT51MAgvIkBBJQvL1WA" with the name "Ares"
     wait 5 seconds
     set {channel} to channel with id "{@logChannel}"
     set {chatChannel} to channel with id "{@chatChannel}"
@@ -167,12 +166,31 @@ discord command plist:
         else if size of all players is 0:
             send "Players:%nl%```No Players Online```%nl%`%amount of online players%/%max player count%`" to event-channel with "Ares"
 
+command /link:
+    trigger:
+        set {_e} to random 8 char string from charset `a-zA-Z0-9`
+        set {code::%{_e}%} to player
+        send "&6Your code to link is %{_e}%" to player
+
+discord command link [<text>]:
+    prefixes: {@prefix}
+    trigger:
+        if arg 1 is not set:
+            reply with "Please input your verification code, if you do not have one type /link ingame."
+        else if {code::%arg 1%} is not set:
+            reply with "Please type /link ingame to get your verification code."
+        else if {code::%arg 1%} is set:
+            set {discord::%discord id of event-user%::player} to {code::%arg-1%}
+            set {discord::%discord id of event-user%} to discord id of event-user
+            reply with "Your minecraft account: %{code::%arg 1%}% has been linked to your discord account!"
+            delete {code::%arg 1%}
+
 discord command kick <player> <text>:
     prefixes: {@prefix}
     executable in: guild
     bots: Ares
     trigger:
-        if event-user has {staffRole}:
+        if event-user has role with id "707746440289583164":
             if arg 2 is not set:
                 create embed:
                     set author info of the embed to "Punishments"
@@ -266,6 +284,12 @@ command /getgen:
             getGen("Compressed Ice", player)
         create a gui slot 34 of player with sea lantern named "&f&lCactus Generator" to run:
             getGen("Cactus", player)
+        create a gui slot 37 of player with sea lantern named "&f&lPrismarine Generator" to run:
+            getGen("Prismarine", player)
+        create a gui slot 38 of player with sea lantern named "&f&lBone Generator" to run:
+            getGen("Bone", player)
+        create a gui slot 39 of player with sea lantern named "&f&lEnd Stone Generator" to run:
+            getGen("End Stone", player)
 
 function getGen(gen: string, p: player):
     if {_gen} is "Gunpowder":
@@ -337,6 +361,12 @@ function getGen(gen: string, p: player):
     if {_gen} is "Compressed Ice":
         give 1 sea lantern named "&b&lCompressed Ice Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
         send "&e&lYou have been given a compressed ice generator" to {_p}
+    if {_gen} is "Bone":
+        give 1 sea lantern named "&f&lBone Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a Bone generator" to {_p}
+    if {_gen} is "End Stone":
+        give 1 sea lantern named "&e&lEnd Stone Generator" with lore "&fPlace to activate generator||&fBreak to de-activate generator" to {_p}
+        send "&e&lYou have been given a end stone generator" to {_p}
 
 on block place of sea lantern:
     set {_loc} to event-block's location
@@ -352,7 +382,7 @@ on block place of sea lantern:
         send "&e&lPlaced 1 Gunpowder Generator at %{_loc}%" to player
         play sound "block_note_block_pling" with volume 10 and pitch 2 at player
     if name of player's held item contains "Cactus Generator":
-        add {_loc} to {gens::gp::*}
+        add {_loc} to {gens::cactus::*}
         add "&7[&c%now%&7] &c%{_p}%&7 placed a Cactus Generator @ &7%{_loc}%" to {gens::logs::*}
         send "&e&lPlaced 1 Cactus Generator at %{_loc}%" to player
         play sound "block_note_block_pling" with volume 10 and pitch 2 at player
@@ -455,6 +485,16 @@ on block place of sea lantern:
         add {_loc} to {gens::ci::*}
         add "&7[&c%now%&7] &c%player%&7 placed a Compressed Ice Generator @ &7%{_loc}%" to {gens::logs::*}
         send "&e&lPlaced 1 Compressed Ice Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "Bone Generator":
+        add {_loc} to {gens::bone::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a Bone Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 Bone Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if name of player's held item contains "End Stone Generator":
+        add {_loc} to {gens::endst::*}
+        add "&7[&c%now%&7] &c%player%&7 placed a End Stone Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lPlaced 1 End Stone Generator at %{_loc}%" to player
         play sound "block_note_block_pling" with volume 10 and pitch 2 at player
 
 on block break of sea lantern:
@@ -575,6 +615,16 @@ on block break of sea lantern:
         add "&7[&c%now%&7] &c%player%&7 deleted a Compressed Ice Generator @ &7%{_loc}%" to {gens::logs::*}
         send "&e&lRemoved 1 Compressed Ice Generator at %{_loc}%" to player
         play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::bone::*} contains {_loc}:
+        remove {_loc} from {gens::bone::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted a Bone Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved Bone Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
+    if {gens::endst::*} contains {_loc}:
+        remove {_loc} from {gens::endst::*}
+        add "&7[&c%now%&7] &c%player%&7 deleted an End stone Generator @ &7%{_loc}%" to {gens::logs::*}
+        send "&e&lRemoved End stone Generator at %{_loc}%" to player
+        play sound "block_note_block_pling" with volume 10 and pitch 2 at player
 
 every 1 second:
     drop 1 coal at {gens::coal::*} without velocity
@@ -588,17 +638,19 @@ every 1 second:
     drop 1 fire charge at {gens::fc::*} without velocity
     drop 1 purpur block at {gens::purpur::*} without velocity
     drop 1 redstone at {gens::redstone::*} without velocity
-    drop 1 netherwart at {gens::nw::*} without velocity
+    drop 1 nether wart at {gens::nw::*} without velocity #FPE
     drop 1 tnt at {gens::tnt::*} without velocity
-    drop 1 slime ball at {gens::slime::*} without velocity
+    drop 1 slimeball at {gens::slime::*} without velocity
     drop 1 bedrock at {gens::bedrock::*} without velocity
-    drop 1 obsidian at {gens::obby::*} without velocity
+    drop 1 obsidian at {gens::obsidian::*} without velocity
     drop 1 blaze powder at {gens::bp::*} without velocity
     drop 1 gray dye at {gens::gd::*} without velocity
     drop 1 firework star at {gens::fs::*} without velocity
     drop 1 emerald at {gens::em::*} without velocity
     drop 1 blue dye at {gens::bd::*} without velocity
     drop 1 diamond at {gens::dia::*} without velocity
+    drop 1 bone at {gens::bone::*} without velocity
+    drop 1 end stone at {gens::endst::*} without velocity #FPE
     drop 1 packed ice named "Compressed Ice" at {gens::ci::*} without velocity
 
 # Upgrades System
@@ -889,6 +941,11 @@ command /mute [<offline player>] [<text>] [<text>]:
                         set {mutet::%arg-1's uuid%} to {_time} from now
                         set {mutet2::%arg-1's uuid%} to {_time}
 
+on chat:
+    if {mute::%player's uuid%} is set:
+        cancel event
+        send "%{mute::%arg-1's uuid%}%"
+
 command /unmute [<offlineplayer>]:
     permission: gungen.mute
     permission message: {@NoPerm}
@@ -932,7 +989,17 @@ command /unban [<offline player>]:
             broadcast "&c<!> &c%player%&c has unbanned &c%{_banned}%&c."
         else:
             send "&b/unban &c<player>"
-
+command /unmute [<offline player>]:
+  permission: Gungens.staff.unmute
+  permission message: &cNo Permission.
+  trigger:
+      if arg 1 is set:
+          send "&7You have been unmuted!" to loop-player
+          delete {mute::%arg-1's uuid%}
+          delete {mutet::%arg-1's uuid%}
+          delete {mutet2::%arg-1's uuid%}
+      else:
+          send "&b/unmute &c<player>"
 
 # Grappling Hook
 
